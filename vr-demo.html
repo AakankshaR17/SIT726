@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VirtualVenue - Full Screen VR Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.2.0/aframe.min.js"></script>
+</head>
+<body>
+    <a-scene>
+        <!-- Virtual Concert Stage -->
+        <a-box position="0 2 -5" width="10" height="4" depth="1" color="#8B4513"></a-box>
+        <a-cylinder position="-4 1 -5" radius="0.2" height="2" color="#A0522D"></a-cylinder>
+        <a-cylinder position="4 1 -5" radius="0.2" height="2" color="#A0522D"></a-cylinder>
+        
+        <!-- Spotlights -->
+        <a-entity light="type: spot; angle: 45; color: #FF0000; intensity: 2" position="-3 5 -2"></a-entity>
+        <a-entity light="type: spot; angle: 45; color: #00FF00; intensity: 2" position="0 5 -2"></a-entity>
+        <a-entity light="type: spot; angle: 45; color: #0000FF; intensity: 2" position="3 5 -2"></a-entity>
+
+        <!-- Audience Area -->
+        <a-box position="0 -0.5 0" width="20" height="0.1" depth="20" color="#1E1E1E"></a-box>
+        
+        <!-- Virtual Screens -->
+        <a-plane position="-8 4 -5" rotation="0 45 0" width="6" height="4" color="#000000"></a-plane>
+        <a-plane position="8 4 -5" rotation="0 -45 0" width="6" height="4" color="#000000"></a-plane>
+
+        <!-- Ambient Light -->
+        <a-entity light="type: ambient; color: #BBB"></a-entity>
+
+        <!-- Sky -->
+        <a-sky color="#87CEEB"></a-sky>
+
+        <!-- Camera and Controls -->
+        <a-entity position="0 1.6 5">
+            <a-camera></a-camera>
+        </a-entity>
+    </a-scene>
+</body>
+</html>

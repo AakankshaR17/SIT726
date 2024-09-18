@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VirtualVenue - Experience Events in AR/VR</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.2.0/aframe.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+            --background-color: #f0f2f5;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(10px);
+            transition: background-color 0.3s ease;
+        }
+        
+        .navbar.scrolled {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+        }
+        
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('background.webp');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 150px 0;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .featured-event {
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .featured-event::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+            z-index: 1;
+        }
+        
+        .featured-event:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .featured-event h3 {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+        }
+        
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+        
+        .category-item:hover .category-icon {
+            transform: scale(1.1);
+        }
+        
+        .how-it-works {
+            background-color: #ffffff;
+            padding: 6rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .step-card {
+            text-align: center;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        #eventCountdown {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            color: var(--secondary-color);
+        }
+        
+        .vr-demo {
+            background-color: #000;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #vrCanvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .testimonial {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .testimonial:hover {
+            transform: translateY(-5px);
+        }
+        
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+        
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 4rem 0 2rem;
+        }
+        
+        .social-icons a {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .social-icons a:hover {
+            color: var(--secondary-color);
+        }
+        vr-demo-container {
+            height: 600px;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-vr-cardboard me-2"></i>VirtualVenue
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#events">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">How It Works</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#vr-demo">VR Demo</a>
+                    </li>
+                </ul>
+                <form class="d-flex me-2">
+                    <input class="form-control me-2" type="search" placeholder="Search events" aria-label="Search">
+                    <button class="btn btn-outline-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                <div>
+                    <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="fas fa-sign-in-alt me-1"></i>Login
+                    </button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+                        <i class="fas fa-user-plus me-1"></i>Register
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header id="home" class="hero">
+        <div class="container hero-content">
+            <h1 class="display-3 mb-4">Experience Events Like Never Before</h1>
+            <p class="lead mb-4">Attend concerts, sports, and cultural events from anywhere in the world using AR/VR technology.</p>
+            <a href="#vr-demo" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-glasses me-2"></i>Try VR Demo
+            </a>
+            <a href="#events" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-calendar-alt me-2"></i>Explore Events
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section id="events" class="container my-5">
+            <h2 class="text-center mb-5">Featured Events</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="featured-event rounded" style="background-image: url('logo.webp');">
+                        <h3 class="mb-3">Virtual Concert Experience</h3>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="featured-event rounded" style="background-image: url('livesport.jpeg');">
+                        <h3 class="mb-3">Live Sports in AR</h3>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="featured-event rounded" style="background-image: url('museum.jpeg');">
+                        <h3 class="mb-3">Virtual Museum Tour</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container my-5">
+            <h2 class="text-center mb-5">Explore Categories</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-3 col-sm-6 mb-4 text-center category-item">
+                    <i class="fas fa-music category-icon"></i>
+                    <h4>Music</h4>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4 text-center category-item">
+                    <i class="fas fa-futbol category-icon"></i>
+                    <h4>Sports</h4>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4 text-center category-item">
+                    <i class="fas fa-palette category-icon"></i>
+                    <h4>Arts</h4>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4 text-center category-item">
+                    <i class="fas fa-graduation-cap category-icon"></i>
+                    <h4>Education</h4>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="how-it-works">
+            <div class="container">
+                <h2 class="text-center mb-5">How It Works</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="step-card">
+                            <i class="fas fa-search fa-3x mb-3 text-primary"></i>
+                            <h4>Find an Event</h4>
+                            <p>Browse our wide selection of virtual events from around the world.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="step-card">
+                            <i class="fas fa-ticket-alt fa-3x mb-3 text-primary"></i>
+                            <h4>Get Your Ticket</h4>
+                            <p>Purchase your virtual ticket and prepare your AR/VR gear.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="step-card">
+                            <i class="fas fa-glass-cheers fa-3x mb-3 text-primary"></i>
+                            <h4>Enjoy the Experience</h4>
+                            <p>Immerse yourself in the event as if you were really there!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="vr-demo" class="container-fluid my-5">
+            <h2 class="text-center mb-4">VR Demo</h2>
+            <div class="vr-demo-container">
+                <a-scene embedded>
+                    <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+                    <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+                    <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+                    <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+                    <a-sky color="#ECECEC"></a-sky>
+                    <a-entity position="0 0 3.8">
+                        <a-camera></a-camera>
+                    </a-entity>
+                </a-scene>
+            </div>
+            <div class="text-center mt-4">
+                <p>Use your mouse to look around. Click and drag to change your view.</p>
+                <p>On mobile devices, you can move your phone to look around.</p>
+                <a href="vr-demo.html" class="btn btn-primary btn-lg mt-3">
+                    <i class="fas fa-vr-cardboard me-2"></i>Full Screen VR Experience
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-light py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>About Us</h5>
+                    <p>VirtualVenue brings the world's events to your living room through cutting-edge AR/VR technology.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Contact</h5>
+                    <p><i class="fas fa-envelope me-2"></i>info@virtualvenue.com</p>
+                    <p><i class="fas fa-phone me-2"></i>(123) 456-7890</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Follow Us</h5>
+                    <div class="social-icons">
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            &copy;
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+            <script>
+                // Event Countdown
+                function eventCountdown() {
+                    const eventDate = new Date('2024-12-31T00:00:00').getTime();
+                    const now = new Date().getTime();
+                    const timeLeft = eventDate - now;
+        
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000)) / 1000);
+        
+                    document.getElementById("eventCountdown").innerHTML =
+                        days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+        
+                    if (timeLeft < 0) {
+                        clearInterval(countdownTimer);
+                        document.getElementById("eventCountdown").innerHTML = "Event Started!";
+                    }
+                }
+        
+                const countdownTimer = setInterval(eventCountdown, 1000);
+        
+                // Navbar scroll effect
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 50) {
+                        document.querySelector('.navbar').classList.add('scrolled');
+                    } else {
+                        document.querySelector('.navbar').classList.remove('scrolled');
+                    }
+                });
+            </script>
